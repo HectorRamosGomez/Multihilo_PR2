@@ -43,4 +43,32 @@ public class ExploradorArchivos extends JFrame {
         iniciarEscaneo();
     }
 
+    private void iniciarEscaneo() {
+        hiloEscaneo = new Thread(() -> {
+            File raiz = new File("C:\\");
+            listarRecursivo(raiz);
+        });
+        hiloEscaneo.start();
+    }
+
+    private void listarRecursivo(File directorio) {
+        if (detenido || directorio == null) return;
+
+        File[] archivos = directorio.listFiles();
+        if (archivos != null) {
+            for (File archivo : archivos) {
+                if (detenido) return;
+
+                SwingUtilities.invokeLater(() -> {
+                    textArea.append(archivo.getAbsolutePath() + "\n");
+                    textArea.setCaretPosition(textArea.getDocument().getLength());
+                });
+
+                if (archivo.isDirectory()) {
+                    listarRecursivo(archivo);
+                }
+            }
+        }
+    }
+
 }
